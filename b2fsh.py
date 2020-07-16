@@ -184,8 +184,8 @@ def advanced_download(path):
         shell("mkdir /tmp/"+id)
         shell("cp -r "+path+" /tmp/"+id)
         name=path.replace("/","").replace("*","")
-        shell('tar -zcvf /tmp/'+name+'.tar.gz -C /tmp/'+id)
-        shell("download /tmp/"+name)
+        shell('tar -zcvf /tmp/'+name+'.tar.gz /tmp/'+id)
+        shell("download /tmp/"+name+".tar.gz")
     else:
         shell("download "+path)
 

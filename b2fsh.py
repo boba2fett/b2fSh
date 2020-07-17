@@ -36,15 +36,7 @@ class MyPrompt(Cmd):
     def update_prompt(self):
         global CWD, host, connected
         if connected:
-            # if Fore.YELLOW in self.prompt:
-            # print(str(Fore.YELLOW))
-            # print(str(self.prompt))
-            if Fore.YELLOW in self.prompt:  # gets hooked somehow
-                # print("\r"+self.prompt,end='')
-                # print("lool")
-                # line=readline.get_line_buffer()
-                # print(len(line),end='')
-                # print(line,end="")
+            if Fore.YELLOW in self.prompt:
                 self.prompt = Fore.GREEN+"b2fsh@"+host+Fore.WHITE + \
                     ":"+Fore.BLUE+CWD+Fore.WHITE+" $ "+Style.RESET_ALL
             self.prompt = Fore.GREEN+"b2fsh@"+host+Fore.WHITE + \
@@ -81,7 +73,7 @@ class MyPrompt(Cmd):
         else:
             resp = request("?feature=hint", {
                            "filename": text, "cwd": CWD, "type": "file"})
-            self.update_prompt()  # has no effect
+            self.update_prompt()  # has no effect when no enter is pressed
             if resp:
                 resp["files"] = list(filter(None, resp["files"]))
                 return resp["files"]
@@ -101,7 +93,6 @@ class MyPrompt(Cmd):
             resp["files"] = list(filter(None, resp["files"]))
             resp["files"] = [text[text.startswith(
                 "/") and len("/"):] for text in resp["files"]]
-            # print(line)
             return resp["files"]
         else:
             return list()
@@ -161,14 +152,14 @@ def gather_infos():  # every file of file-locations.txt until an empty line occu
     global target
     f = open("file-locations.txt", "r")
     while l := f.readline():
-        if l:=l.strip():
+        if l := l.strip():
             advanced_download(l)
         else:
             return f
     f.close()
 
 
-def gather_more():  # every file after the empty line #TODO support for wildcard in path
+def gather_more():  # every file after the empty line
     global target
     # more should always include the most important and most important should always be first
     f = gather_infos()
@@ -176,18 +167,19 @@ def gather_more():  # every file after the empty line #TODO support for wildcard
     while l := f.readline():
         if l := l.strip():
             advanced_download(l)
-            
 
-def advanced_download(path):
+
+def advanced_download(path):  # cp into tmp when it is an wildcard or directory
     if "*" in path or path.endswith("/"):
-        id=str(uuid.uuid4())
+        id = str(uuid.uuid4())
         shell("mkdir /tmp/"+id)
         shell("cp -r "+path+" /tmp/"+id)
-        name=path.replace("/","").replace("*","")
+        name = path.replace("/", "").replace("*", "")
         shell('tar -zcvf /tmp/'+name+'.tar.gz /tmp/'+id)
         shell("download /tmp/"+name+".tar.gz")
     else:
         shell("download "+path)
+
 
 def shell(command):
     global CWD

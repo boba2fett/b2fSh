@@ -21,5 +21,29 @@ b2fshell:~# is a very basic, single-file, PHP shell. It can be used to quickly e
 * **2020-06-17:** Local python interface
 * **2020-07-16:** Wildcard in Path
 
-## TODO
+## Usage
 
+```
+b2fsh.py [-h] [-i] [-m] [-d] [-a] [-f FILEIN] target
+
+Use with b2fshell.php or b2fshell-headless.php
+
+positional arguments:
+  target
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -i, --infos           extracts the most important information
+  -m, --more            extracts the all important information
+  -d, --disturb         leaves disturbtion
+  -a, --auto            non interactive
+  -f FILEIN, --filein FILEIN
+                        readin file to exec
+```
+## Example
+```
+b2fsh.py -m -f example.2sh "http://localhost"
+```
+
+## TODO
+* find other ways of disturbtion
